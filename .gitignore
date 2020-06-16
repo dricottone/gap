@@ -1,4 +1,7 @@
 **/__pycache__
 **/*.pyc
 tests/generated_syntax/*
+build
+dist
+*.egg-info
 
