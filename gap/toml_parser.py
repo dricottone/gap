@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-from typing import Dict
+from typing import MutableMapping, Any
 
 import toml
 
-def data_from_file(filename: str) -> Dict:
+def data_from_file(filename: str) -> MutableMapping[str, Any]:
     try:
         with open(filename, 'r') as f:
             data = toml.load(f)
@@ -15,7 +15,4 @@ def data_from_file(filename: str) -> Dict:
         message = 'file "{0}" is invalid TOML'.format(filename)
         raise ValueError(message) from None
     return data
-
-if __name__=="__main__":
-    pass
 

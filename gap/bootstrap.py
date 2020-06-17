@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# mypy: ignore_errors
 
 import toml
 

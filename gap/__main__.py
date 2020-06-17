@@ -5,36 +5,76 @@ import sys
 from . import generator
 from . import cli
 
+def msg(content, quiet):
+    if not quiet:
+        for line in content:
+            sys.stdout.write(line)
+            sys.stdout.write("\n")
+
+def err(content, quiet):
+    if not quiet:
+        for line in content:
+            sys.stdout.write(line)
+            sys.stdout.write("\n")
+
+
 def help_message():
     message = (
-        "Usage: gap [OPTIONS] INPUT\n"
+        "gap - Generate argument parser syntax for Python programs",
+        "Usage: gap [OPTIONS] <INPUT>",
+        "Options:",
+        "  -f <FMT>,                define <INPUT>'s format [Default: toml]",
+        "    --format <FMT>",
+        "  -h, --help               print this message",
+        "  -o <FILE>,E>             write parser to <FILE>, instead of STDOUT",
+        "    --output <FILE>",
+        "  -q,--quiet               suppress error messages",
+        "  -v,--verbose             print debugging messages",
+        "  -V,--version             print executable version",
+        "  --no-debug-mode,         include `--debug-gap-behavior' debugging",
+        "    --debug-mode             flag in parser? [Default: No]",
+        "  --no-attached-values,    include handling for values attached to",
+        "    --attached-values        options (i.e. -a=b)? [Default: Yes]",
+        "  --no-executable,         include standalone program in generated",
+        "    --executable             parser? [Default: No]",
+        "  --no-raise-on-overfull,  include check for too many values given",
+        "    --raise-on-overfull      to an option? [Default: Yes]",
     )
-    sys.stdout.write(message)
+    msg(message, False)
 
 def version_message():
     message = (
-        "gap 1.0.0\n"
+        "gap 1.0.1",
     )
-    sys.stdout.write(message)
+    msg(message, False)
 
-def usage_message():
+def usage_message(quiet):
     message = (
-        "Usage: gap [OPTIONS] INPUT\n"
+        "Usage: gap [OPTIONS] INPUT",
     )
-    sys.stderr.write(message)
+    err(message, quiet)
 
-def format_message(input_format):
+def format_message(input_format, quiet):
     message = (
-        f'gap: Invalid input format "{input_format}"\n'
-        "Use one of: toml\n"
+        '{0}: Invalid input format "{1}"'.format(sys.argv[0], input_format),
+        'Use one of: toml',
     )
-    sys.stderr.write(message)
+    err(message, quiet)
 
-def file_message(filename):
+def file_message(filename, quiet):
     message = (
-        f'gap: Cannot access file "{filename}"\n'
+        '{0}: Cannot access file "{1}"\n'.format(sys.argv[0], filename),
     )
-    sys.stderr.write(message)
+    err(message, quiet)
+
+def file_format_message(filename, input_format, quiet):
+    _format = {"toml": "TOML"}[input_format]
+    message = (
+        '{0}: File "{1}" is not a valid {2} file\n'.format(
+            sys.argv[0], filename, _format,
+        ),
+    )
+    err(message, quiet)
 
 def main():
     config, positionals = cli.main(sys.argv[1:])
@@ -47,9 +87,23 @@ def main():
         version_message()
         sys.exit(0)
 
+    # Set verbosity level
+    verbose = False
+    quiet = False
+    if "verbose" in config.keys():
+        verbose = True
+        quiet = False
+    if "quiet" in config.keys():
+        verbose = False
+        quiet = True
+    if "output" in config.keys():
+        output_filename = config["output"]
+    else:
+        output_filename = None
+
     # Check for too few arguments
     if len(positionals) == 0:
-        usage_message()
+        usage_message(quiet)
         sys.exit(1)
     else:
         filename = positionals[0]
@@ -60,21 +114,10 @@ def main():
         if input_format == "toml":
             from . import toml_parser as parser
         else:
-            format_message(input_format)
+            format_message(input_format, quiet)
             sys.exit(0)
     else:
         from . import toml_parser as parser
-
-    # Set verbosity level
-    verbose = False
-    if "verbose" in config.keys():
-        verbose = True
-    if "quiet" in config.keys():
-        verbose = False
-    if "output" in config.keys():
-        output_filename = config["output"]
-    else:
-        output_filename = None
 
     # Set generator options
     attached_values = generator.DEFAULT_ATTACHED_VALUES
@@ -102,7 +145,15 @@ def main():
         raise_on_overfull = False
 
     # Parse input file and generate output
-    data = parser.data_from_file(filename)
+    try:
+        data = parser.data_from_file(filename)
+    except OSError:
+        file_message(filename, quiet)
+        sys.exit(1)
+    except ValueError: #parser-dependent exceptions are converted to ValueError
+        file_format_message(filename, input_format, quiet)
+        sys.exit(1)
+
     options = generator.Options._from_dict(data, expand_alternatives=True)
     options.attached_values(attached_values)
     options.debug_mode(debug_mode)
@@ -116,7 +167,8 @@ def main():
             with open(output_filename, 'w') as f:
                 f.write(syntax)
         except OSError:
-            file_message(output_filename)
+            file_message(output_filename, quiet)
+            sys.exit(1)
     else:
         sys.stdout.write(syntax)
     sys.exit(0)

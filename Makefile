@@ -6,7 +6,7 @@ unittest_discover = unittest --color --working-directory .
 python = python3
 
 clean:
-	rm -rf **/__pycache__ **/*.pyc
+	rm -rf **/__pycache__ **/__mypycache__ **/*.pyc build dist gap.egg_info
 
 bootstrap:
 	./gap/bootstrap.py > gap/cli.py
@@ -18,10 +18,9 @@ test:
 	$(unittest_discover) tests
 	$(python) -m py_compile tests/generated_syntax/*.py
 	$(unittest) tests/generated_syntax_tests.py
+	MYPY_CACHE_DIR=gap/__mypycache__ mypy -p gap
 
 build:
-	mkdir -p build
-	mkdir -p dist
 	$(python) setup.py sdist bdist_wheel
 
 unittest:
