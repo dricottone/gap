@@ -28,7 +28,7 @@ unittest:
 	$(unittest) tests/generated_syntax_tests.py --verbose
 
 install:
-	pipx install --spec . gap
+	pipx install .
 
 uninstall:
 	pipx uninstall gap
