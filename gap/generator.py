@@ -380,80 +380,75 @@ class Option(object):
 
     def _build_syntax_flag(self) -> List[str]:
         #Generate syntax to consume a flag (Optional[bool])
-        cnn = self.canon_name
-        if self._raise_on_overfull and self._attached_values:
-            return [
-                """if attached_value is not None:""",
-                """\tmessage=(""",
-                """\t\t'unexpected value while parsing "{0}"'""".format(cnn),
-                """\t\t' (expected 0 values)'""",
-                """\t)""",
-                """\traise ValueError(message) from None""",
-                """config["{0}"]=True""".format(cnn),
-            ]
-        else:
-            return [
-                    """config["{0}"]=True""".format(self.canon_name),
-            ]
+        if self._raise_on_overfull and self._attached_values: return [
+            """if attached_value is not None:""",
+            """\tmessage=(""",
+            """\t\t'unexpected value while parsing "{0}"'""".format(
+                self.canon_name,
+            ),
+            """\t\t' (expected 0 values)'""",
+            """\t)""",
+            """\traise ValueError(message) from None""",
+            """config["{0}"]=True""".format(self.canon_name)
+        ]
+        else: return [
+            """config["{0}"]=True""".format(self.canon_name),
+        ]
 
     def _build_syntax_singleton(self) -> List[str]:
         #Generate syntax to consume an option (Optional[str])
-        cnn = self.canon_name
-        if self._attached_values:
-            return [
-                """if attached_value is not None:""",
-                """\tconfig["{0}"]=attached_value""".format(cnn),
-                """\tattached_value=None""",
-                """\tconsuming,needing,wanting=None,0,0""",
-                """else:""",
-                """\tconfig["{0}"]=None""".format(cnn),
-                """\tconsuming,needing,wanting="{0}",1,1""".format(cnn),
-            ]
-        else:
-            return [
-                """config["{0}"]=None""".format(cnn),
-                """consuming,needing,wanting="{0}",1,1""".format(cnn),
-            ]
+        if self._attached_values: return [
+            """if attached_value is not None:""",
+            """\tconfig["{0}"]=attached_value""".format(self.canon_name),
+            """\tattached_value=None""",
+            """\tconsuming,needing,wanting=None,0,0""",
+            """else:""",
+            """\tconfig["{0}"]=None""".format(self.canon_name),
+            """\tconsuming,needing,wanting="{0}",1,1""".format(self.canon_name),
+        ]
+        else: return [
+            """config["{0}"]=None""".format(self.canon_name),
+            """consuming,needing,wanting="{0}",1,1""".format(self.canon_name),
+        ]
 
     def _build_syntax_optional_singleton(self) -> List[str]:
         #Generate syntax to consume a 0 or 1 value option (Optional[List[str]])
-        cnn = self.canon_name
-        if self._attached_values:
-            return [
-                """if attached_value is not None:""",
-                """\tconfig["{0}"]=[attached_value]""".format(cnn),
-                """\tconsuming,needing,wanting=None,0,0""",
-                """\tattached_value=None""",
-                """else:""",
-                """\tconfig["{0}"]=[]""".format(cnn),
-                """\tconsuming,needing,wanting="{0}",1,1""".format(cnn),
-            ]
-        else:
-            return [
-                """config["{0}"]=[]""".format(cnn),
-                """consuming,needing,wanting="{0}",1,1""".format(cnn),
-            ]
+        if self._attached_values: return [
+            """if attached_value is not None:""",
+            """\tconfig["{0}"]=[attached_value]""".format(self.canon_name),
+            """\tconsuming,needing,wanting=None,0,0""",
+            """\tattached_value=None""",
+            """else:""",
+            """\tconfig["{0}"]=[]""".format(self.canon_name),
+            """\tconsuming,needing,wanting="{0}",1,1""".format(self.canon_name),
+        ]
+        else: return [
+            """config["{0}"]=[]""".format(self.canon_name),
+            """consuming,needing,wanting="{0}",1,1""".format(self.canon_name),
+        ]
 
 
     def _build_syntax_multivalue(self) -> List[str]:
         #Generate syntax to consume a multi-value option (Optional[List[str]])
-        cnn = self.canon_name
-        etc = (cnn, self.min-1, self.max-1, )
-        if self._attached_values:
-            return [
-                """if attached_value is not None:""",
-                """\tconfig["{0}"]=[attached_value]""".format(cnn),
-                """\tconsuming,needing,wanting="{0}",{1},{2}""".format(*etc),
-                """\tattached_value=None""",
-                """else:""",
-                """\tconfig["{0}"]=[]""".format(cnn),
-                """\tconsuming,needing,wanting="{0}",{1},{2}""".format(*etc),
-            ]
-        else:
-            return [
-                    """config["{0}"]=[]""".format(cnn),
-                    """consuming,needing,wanting="{0}",{1},{2}""".format(*etc),
-            ]
+        if self._attached_values: return [
+            """if attached_value is not None:""",
+            """\tconfig["{0}"]=[attached_value]""".format(self.canon_name),
+            """\tconsuming,needing,wanting="{0}",{1},{2}""".format(
+                self.canon_name, self.min-1, self.max-1,
+            ),
+            """\tattached_value=None""",
+            """else:""",
+            """\tconfig["{0}"]=[]""".format(self.canon_name),
+            """\tconsuming,needing,wanting="{0}",{1},{2}""".format(
+                self.canon_name, self.min, self.max,
+            ),
+        ]
+        else: return [
+            """config["{0}"]=[]""".format(self.canon_name),
+            """consuming,needing,wanting="{0}",{1},{2}""".format(
+                self.canon_name, self.min, self.max,
+            ),
+        ]
 
 def test_expand_alternatives():
     a = Option("a", minimum=0, maximum=1, alternatives=["ab", "abc"])

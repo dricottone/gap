@@ -27,6 +27,8 @@ unittest:
 	$(unittest_discover) tests --verbose
 	$(unittest) tests/generated_syntax_tests.py --verbose
 
+reinstall: uninstall install
+
 install:
 	pipx install .
 
