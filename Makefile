@@ -6,7 +6,7 @@ unittest_discover = unittest --color --working-directory .
 python = python3
 
 clean:
-	rm -rf **/__pycache__ **/__mypycache__ **/*.pyc build dist gap.egg_info
+	rm -rf **/__pycache__ **/__mypycache__ **/*.pyc build dist gap.egg-info
 
 bootstrap:
 	./gap/bootstrap.py > gap/cli.py
