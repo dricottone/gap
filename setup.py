@@ -9,7 +9,7 @@ with open('README.md', encoding='utf-8') as f:
 setup(
     name="gap",
     packages=["gap"],
-    version="1.0.0",
+    version="1.0.1",
     license="GPL",
     description="Generated argument parser",
     long_description=long_description,

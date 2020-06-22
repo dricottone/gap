@@ -5,20 +5,21 @@ import sys
 from . import generator
 from . import cli
 
-def msg(content, quiet):
+VERSION = (1,0,1,)
+
+def _msg(content, quiet):
     if not quiet:
         for line in content:
             sys.stdout.write(line)
             sys.stdout.write("\n")
 
-def err(content, quiet):
+def _err(content, quiet):
     if not quiet:
         for line in content:
             sys.stdout.write(line)
             sys.stdout.write("\n")
 
-
-def help_message():
+def _help_message():
     message = (
         "gap - Generate argument parser syntax for Python programs",
         "Usage: gap [OPTIONS] <INPUT>",
@@ -40,51 +41,51 @@ def help_message():
         "  --no-raise-on-overfull,  include check for too many values given",
         "    --raise-on-overfull      to an option? [Default: Yes]",
     )
-    msg(message, False)
+    _msg(message, False)
 
-def version_message():
+def _version_message():
     message = (
-        "gap 1.0.1",
+        "gap {0}".format(".".join(str(v) for v in VERSION)),
     )
-    msg(message, False)
+    _msg(message, False)
 
-def usage_message(quiet):
+def _usage_message(quiet):
     message = (
         "Usage: gap [OPTIONS] INPUT",
     )
-    err(message, quiet)
+    _err(message, quiet)
 
-def format_message(input_format, quiet):
+def _format_message(input_format, quiet):
     message = (
         '{0}: Invalid input format "{1}"'.format(sys.argv[0], input_format),
         'Use one of: toml',
     )
-    err(message, quiet)
+    _err(message, quiet)
 
-def file_message(filename, quiet):
+def _file_message(filename, quiet):
     message = (
         '{0}: Cannot access file "{1}"\n'.format(sys.argv[0], filename),
     )
-    err(message, quiet)
+    _err(message, quiet)
 
-def file_format_message(filename, input_format, quiet):
+def _file_format_message(filename, input_format, quiet):
     _format = {"toml": "TOML"}[input_format]
     message = (
         '{0}: File "{1}" is not a valid {2} file\n'.format(
             sys.argv[0], filename, _format,
         ),
     )
-    err(message, quiet)
+    _err(message, quiet)
 
 def main():
     config, positionals = cli.main(sys.argv[1:])
 
     # Check for --help
     if "help" in config.keys():
-        help_message()
+        _help_message()
         sys.exit(0)
     elif "version" in config.keys():
-        version_message()
+        _version_message()
         sys.exit(0)
 
     # Set verbosity level
@@ -103,7 +104,7 @@ def main():
 
     # Check for too few arguments
     if len(positionals) == 0:
-        usage_message(quiet)
+        _usage_message(quiet)
         sys.exit(1)
     else:
         filename = positionals[0]
@@ -114,7 +115,7 @@ def main():
         if input_format == "toml":
             from . import toml_parser as parser
         else:
-            format_message(input_format, quiet)
+            _format_message(input_format, quiet)
             sys.exit(0)
     else:
         from . import toml_parser as parser
@@ -148,10 +149,10 @@ def main():
     try:
         data = parser.data_from_file(filename)
     except OSError:
-        file_message(filename, quiet)
+        _file_message(filename, quiet)
         sys.exit(1)
     except ValueError: #parser-dependent exceptions are converted to ValueError
-        file_format_message(filename, input_format, quiet)
+        _file_format_message(filename, input_format, quiet)
         sys.exit(1)
 
     options = generator.Options._from_dict(data, expand_alternatives=True)
@@ -167,7 +168,7 @@ def main():
             with open(output_filename, 'w') as f:
                 f.write(syntax)
         except OSError:
-            file_message(output_filename, quiet)
+            _file_message(output_filename, quiet)
             sys.exit(1)
     else:
         sys.stdout.write(syntax)
