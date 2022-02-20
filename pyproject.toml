@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gap"
+description = "Generated argument parser"
+readme = "README.md"
+version = "1.0.2"
+authors = [ { name = "Dominic Ricottone", email = "me@dominic-ricottone.com" } ]
+urls = { source = "git.dominic-ricottone.com/gap" }
+license = { file = "LICENSE.md" }
+requires-python = ">=3.6"
+dependencies = [
+    "toml >= 0.10.2",
+]
+
+[project.scripts]
+gap = "gap.__main__:main"
+
