@@ -3,6 +3,7 @@
 **/*.pyc
 tests/generated_syntax/*
 build
-dist
+
+# `make build` deletes these but the files can persist if it hits an error
 *.egg-info
 
