@@ -49,13 +49,14 @@ unittest: $(TEST_FILES)
 	$(UNITTEST_FILE_BIN) tests/generated_syntax_tests.py --verbose
 
 PY_FILES=gap/cli.py gap/generator.py gap/__main__.py gap/toml_parser.py
+PYBUILD_FILES=pyproject.toml LICENSE.md README.md
 
-build/gap-$(VERSION)-py3-none-any.whl: build
-
-.PHONY:
-build: $(PY_FILES)
+build/gap-$(VERSION)-py3-none-any.whl: $(PY_FILES) $(PYBUILD_FILES)
 	mkdir -p build
 	$(BUILD_BIN) --wheel --no-isolation --outdir build/
+
+.PHONY: build
+build: build/gap-$(VERSION)-py3-none-any.whl
 
 .PHONY: reinstall
 reinstall: uninstall install
