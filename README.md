@@ -1,14 +1,17 @@
 
 # generated argument parser
 
-A package that uses external configuration files to generate a static, standalone parser module.
+A package that uses external configuration files to generate a static,
+standalone parser module.
 
 
 ## To-Do
 
-Add parsers aside from `toml`, like `json` and `configparser`.
-
-Allow import of third-party libraries, like `toml`, to fail-just remove that format from the valid list.
+Python 3.11 introduces a `tomllib` module. **Release 1.0.2** will continue to
+work perfectly for Python 3.6 or later. **Release 1.0.3** will continue to
+function perfectly as well, but the test suite will fail due to `mypy` not
+having type stubs for `tomllib`. **Release 1.0.4** will drop `toml` as a
+dependency and therefore drop support for Python 3.10 or earlier.
 
 
 ## Workflow

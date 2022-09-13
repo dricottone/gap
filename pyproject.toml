@@ -6,9 +6,9 @@ build-backend = "setuptools.build_meta"
 name = "gap"
 description = "Generated argument parser"
 readme = "README.md"
-version = "1.0.2"
+version = "1.0.3"
 authors = [ { name = "Dominic Ricottone", email = "me@dominic-ricottone.com" } ]
-urls = { source = "git.dominic-ricottone.com/gap" }
+urls = { source = "git.dominic-ricottone.com/~dricottone/gap" }
 license = { file = "LICENSE.md" }
 requires-python = ">=3.6"
 dependencies = [
