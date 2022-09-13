@@ -5,13 +5,23 @@ A package that uses external configuration files to generate a static,
 standalone parser module.
 
 
+## Usage
+
+To install, try:
+
+```
+pipx install git+https://git.dominic-ricottone.com/~dricottone/gap
+```
+
+
 ## To-Do
 
 Python 3.11 introduces a `tomllib` module. **Release 1.0.2** will continue to
 work perfectly for Python 3.6 or later. **Release 1.0.3** will continue to
-function perfectly as well, but the test suite will fail due to `mypy` not
-having type stubs for `tomllib`. **Release 1.0.4** will drop `toml` as a
-dependency and therefore drop support for Python 3.10 or earlier.
+function perfectly as well, but the test suite will fail with Python 3.10 or
+earlier due to `mypy` not having type stubs for `tomllib`. **Release 1.0.4**
+will drop `toml` as a dependency and therefore drop support for Python 3.10 or
+earlier.
 
 
 ## Workflow
