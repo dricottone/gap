@@ -5,7 +5,7 @@ import sys
 from . import generator
 from . import cli
 
-VERSION = (1,0,1,)
+VERSION = (1,0,3,)
 
 def _msg(content, quiet):
     if not quiet:

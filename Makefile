@@ -1,9 +1,12 @@
 VERSION=1.0.3
 
-PY_COMPILE_BIN=python -m py_compile
+#INSTALLER=pip
+INSTALLER=pipx
 
-#BUILD_BIN=python -m build
-BUILD_BIN=pyproject-build
+# If using system build module
+#BUILDER=python -m build
+# If using module installed by pipx
+BUILDER=pyproject-build
 
 #UNITTEST_FILE_BIN=python -m unittest
 #UNITTEST_DIR_BIN=python -m unittest discover --top-level-directory .
@@ -12,9 +15,6 @@ UNITTEST_DIR_BIN=unittest --color --working-directory .
 
 #MYPY_BIN=python -m mypy
 MYPY_BIN=MYPY_CACHE_DIR=gap/__mypycache__ mypy
-
-#PIPX_BIN=python -m pipx
-PIPX_BIN=pipx
 
 .PHONY: clean
 clean:
@@ -36,9 +36,9 @@ TEST_FILES=tests/__init__.py tests/generated_syntax tests/generated_syntax/__ini
 
 .PHONY: test
 test: $(TEST_FILES)
-	$(PY_COMPILE_BIN) gap/*.py
+	python -m py_compile gap/*.py
 	$(UNITTEST_DIR_BIN) tests
-	$(PY_COMPILE_BIN) tests/generated_syntax/*.py
+	python -m py_compile tests/generated_syntax/*.py
 	$(UNITTEST_FILE_BIN) tests/generated_syntax_tests.py
 	$(MYPY_BIN) -p gap
 
@@ -51,25 +51,22 @@ unittest: $(TEST_FILES)
 PY_FILES=gap/cli.py gap/generator.py gap/__main__.py gap/toml_parser.py
 PYBUILD_FILES=pyproject.toml LICENSE.md README.md
 
-build/gap-$(VERSION)-py3-none-any.whl: $(PY_FILES) $(PYBUILD_FILES)
-	mkdir -p build
-	$(BUILD_BIN) --wheel --no-isolation --outdir build/
+dist:
+	mkdir -p dist
 
-.PHONY: build
-build: build/gap-$(VERSION)-py3-none-any.whl
+dist/gap-$(VERSION)-py3-none-any.whl: dist $(PY_FILES) $(PYBUILD_FILES)
+	$(BUILDER) --wheel --no-isolation --outdir build/
 
-.PHONY: reinstall
-reinstall: uninstall install
+build: dist/gap-$(VERSION)-py3-none-any.whl
 
-.PHONY: install
-install: build/gap-$(VERSION)-py3-none-any.whl
-	$(PIPX_BIN) install build/gap-$(VERSION)-py3-none-any.whl
+install: dist/gap-$(VERSION)-py3-none-any.whl
+	$(INSTALLER) install dist/gap-$(VERSION)-py3-none-any.whl
 
-.PHONY: uninstall
 uninstall:
-	$(PIPX_BIN) uninstall gap
+	$(INSTALLER) uninstall gap
 
-.PHONY: rc
-rc:
-	docker run --interactive --tty --rm --name pytest --mount type=bind,src=$(pwd),dst=/code python:3.11-rc sh
+reinstall:
+	make uninstall
+	make install
 
+.PHONY: clean build install uninstall reinstall

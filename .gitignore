@@ -2,8 +2,6 @@
 **/__mypycache__
 **/*.pyc
 tests/generated_syntax/*
-build
-
-# `make build` deletes these but the files can persist if it hits an error
+dist
 *.egg-info
 
