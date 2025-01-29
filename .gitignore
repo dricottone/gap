@@ -3,5 +3,6 @@
 **/*.pyc
 tests/generated_syntax/*
 dist
+build
 *.egg-info
 
