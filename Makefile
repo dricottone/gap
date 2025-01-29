@@ -2,7 +2,7 @@ VERSION=1.0.4
 SRC=$(shell find . -type f -name '*.py')
 
 clean:
-	rm -rf **/__pycache__ **/__mypycache__ **/*.pyc build *.egg-info
+	rm -rf **/__pycache__ **/__mypycache__ **/*.pyc dist build *.egg-info
 
 gap/cli.py: gap/bootstrap.py
 	./gap/bootstrap.py > gap/cli.py
@@ -10,7 +10,7 @@ gap/cli.py: gap/bootstrap.py
 tests/__init__.py:
 	touch tests/__init__.py
 
-tests/generated_syntax/__init__.py: tests/generated_syntax
+tests/generated_syntax/__init__.py:
 	mkdir -p tests/generated_syntax
 	touch tests/__init__.py
 
@@ -19,7 +19,7 @@ test: tests/__init__.py tests/generated_syntax/__init__.py
 	python -m unittest discover --top-level-directory . tests
 	python -m py_compile tests/generated_syntax/*.py
 	python -m unittest tests/generated_syntax_tests.py
-	mypy -p gap
+	mypy --cache-dir=gap/__mypycache__ --package=gap
 
 unittest:
 	python -m unittest discover --top-level-directory . tests --verbose
